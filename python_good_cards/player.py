@@ -117,13 +117,29 @@ class Player(Bot):
                 return DiscardAction(1)
             else:
                 return DiscardAction(2)
+            
+        strong_cards = "TJQKA"
+
         if RaiseAction in legal_actions:
             # the smallest and largest numbers of chips for a legal bet/raise
             min_raise, max_raise = round_state.raise_bounds()
             min_cost = min_raise - my_pip  # the cost of a minimum bet/raise
             max_cost = max_raise - my_pip  # the cost of a maximum bet/raise
-            if random.random() < 0.5:
-                return RaiseAction(min_raise)
+
+            # if we have strong hole cards, let's raise a lot
+            is_strong = True
+            for card in my_cards: # Th
+                if not (card[0] in strong_cards):
+                    is_strong = False
+                    break
+
+            if is_strong:
+                return RaiseAction(min(min_raise * 10, max_raise))
+            
+            else:
+                if random.random() < 0.5:
+                    return RaiseAction(min_raise)
+                
         if CheckAction in legal_actions:  # check-call
             return CheckAction()
         if random.random() < 0.25:
